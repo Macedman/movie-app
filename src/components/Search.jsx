@@ -6,7 +6,7 @@ const Search = ({ searchTerm, setSearchTerm }) => {
         <div>
             <label>
                <input 
-             className='bg-gray-900 input-transparent-bg text-white w-3/5'
+             className='bg-gray-900 input-transparent-bg text-white w-full sm:w-3/5 rounded-lg'
              type='text'
              placeholder='Search through thousands of movies'
              value={searchTerm}

@@ -93,11 +93,11 @@ const App = () => {
       <div className="wrapper">
         <header>
           <img
-            className="size-75 display-block m-auto"
+            className="block w-full max-w-75 aspect-square object-cover mx-auto"
             src={headerImg}
             alt="Movie Theater"
           />
-          <h1 className="m-5 p-5 font-bold text-5xl">
+          <h1 className="my-8 font-bold text-3xl sm:text-5xl">
             Find <span className="text-gradient">Movies</span> You'll Enjoy{" "}
             <br />
             Without the Hassle
@@ -107,12 +107,12 @@ const App = () => {
 
         {trendingMovies.length > 0 && (
           <section className="trending">
-            <h2 className="mt-[40px] text-white">Trending Movies {trendingMovies.length}</h2>
-            <ul className="grid grid-cols-4 gap-4">
+            <h2 className="mt-10 mb-4 text-2xl font-bold text-white">Trending Movies</h2>
+            <ul className="flex flex-wrap justify-center gap-4">
               {trendingMovies.map((movie, index) => (
-                <li key={movie.$id}>
-                  <p>{index + 1}</p>
-                  <img src={movie.poster_url} alt={movie.title} />
+                <li key={movie.$id} className="w-24 sm:w-48">
+                  <p className="mb-1 text-lg font-bold">{index + 1}</p>
+                  <img className="w-full rounded-lg" src={movie.poster_url} alt={movie.searchTerm} />
                 </li>
               ))}
             </ul>
@@ -120,14 +120,14 @@ const App = () => {
         )}
 
         <section className="all-movies">
-          <h2 className="mt-[40px] text-white">All Movies</h2>
+          <h2 className="mt-10 mb-4 text-2xl font-bold text-white">All Movies</h2>
 
           {isLoading ? (
-            <Spinner />
+            <div className="flex justify-center"><Spinner /></div>
           ): errorMessage ? (
             <p className="text-red-700">{errorMessage}</p>
           ) : (
-            <ul className="grid grid-cols-4 gap-4">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {movieList.map((movie) => (
                     <MovieCard key={movie.id} movie={movie}/>
                 ))}

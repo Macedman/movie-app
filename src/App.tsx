@@ -6,12 +6,13 @@ import MovieCard from "./components/MovieCard";
 import { useDebounce } from "react-use";
 import { getTrendingMovies, updateSearchCount } from "./appwrite";
 import headerImg from "./assets/header.jpeg";
+import type { Movie, TmdbMovieListResponse, TrendingMovie } from "./types";
 
 const API_BASE_URL = "https://api.themoviedb.org/3";
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
-const API_OPTIONS = {
+const API_OPTIONS: RequestInit = {
   method: "GET",
   headers: {
     accept: "application/json",
@@ -23,11 +24,11 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
-  const [movieList, setMovieList] = useState([]);
+  const [movieList, setMovieList] = useState<Movie[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
- 
-  const [trendingMovies, setTrendingMovies] = useState([]);
+
+  const [trendingMovies, setTrendingMovies] = useState<TrendingMovie[]>([]);
 
 
   // debounce search for 500ms before calling the search api
@@ -45,7 +46,7 @@ const App = () => {
 
   // `signal` lets the effect cancel this request if a newer search starts,
   // so a slow, stale response can't overwrite newer results.
-  const fetchMovies = async (query, signal) => {
+  const fetchMovies = async (query: string, signal: AbortSignal) => {
     setIsLoading(true);
     setErrorMessage("");
     try {
@@ -58,16 +59,18 @@ const App = () => {
         throw new Error(`TMDB request failed with status ${response.status}`);
       }
 
-      const data = await response.json();
-      setMovieList(data.results || []);
+      const data: TmdbMovieListResponse = await response.json();
+      const results = data.results ?? [];
+      setMovieList(results);
       setIsLoading(false);
 
-      if (query && data.results?.length > 0) {
-        await updateSearchCount(query, data.results[0]);
+      if (query && results.length > 0) {
+        await updateSearchCount(query, results[0]);
         loadTrendingMovies();
       }
     } catch (error) {
-      if (error.name === "AbortError") return; // superseded by a newer search
+      // superseded by a newer search
+      if (error instanceof DOMException && error.name === "AbortError") return;
       console.error("Error fetching movies", error);
       setErrorMessage("Error fetching movies. Please try again.");
       setIsLoading(false);

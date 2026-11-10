@@ -1,6 +1,11 @@
 import starIcon from '../assets/star-icon.svg'
+import type { Movie } from '../types'
 
-const MovieCard = ({ movie: { title, vote_average, poster_path, release_date, original_language } }) => {
+interface MovieCardProps {
+  movie: Movie
+}
+
+const MovieCard = ({ movie: { title, vote_average, poster_path, release_date, original_language } }: MovieCardProps) => {
   return (
     <li className='movie-card flex flex-col bg-blue-950 rounded-xl overflow-hidden'>
         <img

@@ -16,7 +16,7 @@ Find movies you'll enjoy without the hassle. Browse popular movies or search tho
 
 ## Tech stack
 
-- [React 19](https://react.dev/)
+- [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vite.dev/)
 - [Tailwind CSS v4](https://tailwindcss.com/)
 - [Appwrite](https://appwrite.io/) (database for search counts)
@@ -58,7 +58,8 @@ Find movies you'll enjoy without the hassle. Browse popular movies or search tho
 | Command           | What it does                          |
 | ----------------- | ------------------------------------- |
 | `npm run dev`     | Start the dev server                  |
-| `npm run build`   | Build for production into `dist/`     |
+| `npm run build`   | Type-check, then build into `dist/`   |
+| `npm run typecheck` | Run the TypeScript compiler only    |
 | `npm run preview` | Preview the production build locally  |
 | `npm run lint`    | Run ESLint                            |
 
@@ -70,12 +71,14 @@ The site is hosted on GitHub Pages from the `gh-pages` branch, which holds the c
 
 ```
 src/
-├── App.jsx              # Main page: search, trending, movie list
-├── appwrite.js          # Appwrite client: save search counts, get trending
+├── App.tsx              # Main page: search, trending, movie list
+├── appwrite.ts          # Appwrite client: save search counts, get trending
 ├── components/
-│   ├── MovieCard.jsx
-│   ├── Search.jsx
-│   └── Spinner.jsx
+│   ├── MovieCard.tsx
+│   ├── Search.tsx
+│   └── Spinner.tsx
+├── types.ts             # Movie and TrendingMovie types
+├── vite-env.d.ts        # Types for import.meta.env
 ├── assets/              # Images and icons
 └── index.css            # Tailwind and global styles
 ```

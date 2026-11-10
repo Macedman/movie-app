@@ -1,4 +1,9 @@
-const Search = ({ searchTerm, setSearchTerm }) => {
+interface SearchProps {
+  searchTerm: string
+  setSearchTerm: (value: string) => void
+}
+
+const Search = ({ searchTerm, setSearchTerm }: SearchProps) => {
   return (
     <div className='search'>
         <div>

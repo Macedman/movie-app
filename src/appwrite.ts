@@ -1,4 +1,5 @@
 import { Client, Databases, ID, Query } from "appwrite";
+import type { Movie, TrendingMovie } from "./types";
 
 const PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID;
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
@@ -10,7 +11,7 @@ const client = new Client()
 
 const database = new Databases(client);
 
-export const updateSearchCount = async (rawSearchTerm, movie) => {
+export const updateSearchCount = async (rawSearchTerm: string, movie: Movie): Promise<void> => {
     // Normalize so "Batman", "batman " and "BATMAN" count as the same search
     const searchTerm = rawSearchTerm.trim().toLowerCase();
 
@@ -18,7 +19,7 @@ export const updateSearchCount = async (rawSearchTerm, movie) => {
     //2. If it exists, update the count
     //3. If it doesn't exist, create a new document with the search term and count as 1
   try {
-    const result = await database.listDocuments(DATABASE_ID, COLLECTION_ID, [
+    const result = await database.listDocuments<TrendingMovie>(DATABASE_ID, COLLECTION_ID, [
         Query.equal("searchTerm", searchTerm),
     ]);
 
@@ -41,9 +42,9 @@ export const updateSearchCount = async (rawSearchTerm, movie) => {
 };
 
 
-export const getTrendingMovies = async () => {
+export const getTrendingMovies = async (): Promise<TrendingMovie[]> => {
     try {
-        const result = await database.listDocuments(DATABASE_ID, COLLECTION_ID, [
+        const result = await database.listDocuments<TrendingMovie>(DATABASE_ID, COLLECTION_ID, [
             Query.limit(5),
             Query.orderDesc("count"),
         ])

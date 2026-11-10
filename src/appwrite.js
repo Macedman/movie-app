@@ -10,7 +10,10 @@ const client = new Client()
 
 const database = new Databases(client);
 
-export const updateSearchCount = async (searchTerm, movie) => {
+export const updateSearchCount = async (rawSearchTerm, movie) => {
+    // Normalize so "Batman", "batman " and "BATMAN" count as the same search
+    const searchTerm = rawSearchTerm.trim().toLowerCase();
+
     //1. Use appwrite SDK to check if the search term already exists in the database
     //2. If it exists, update the count
     //3. If it doesn't exist, create a new document with the search term and count as 1
@@ -33,7 +36,7 @@ export const updateSearchCount = async (searchTerm, movie) => {
         })
     }
   } catch (error) {
-    console.log(error);
+    console.error("Error updating search count", error);
   }
 };
 
@@ -45,10 +48,9 @@ export const getTrendingMovies = async () => {
             Query.orderDesc("count"),
         ])
 
-        console.log(result.documents);
         return result.documents;
     } catch(error) {
-        console.log(error);
+        console.error("Error loading trending movies", error);
         return [];
     }
 }

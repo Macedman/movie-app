@@ -5,7 +5,7 @@ const MovieCard = ({ movie: { title, vote_average, poster_path, release_date, or
     <li className='movie-card flex flex-col bg-blue-950 rounded-xl overflow-hidden'>
         <img
          className='w-full aspect-[2/3] object-cover'
-         src={poster_path ? `https://image.tmdb.org/t/p/w500/${poster_path}` : `${import.meta.env.BASE_URL}vite.svg`}
+         src={poster_path ? `https://image.tmdb.org/t/p/w500${poster_path}` : `${import.meta.env.BASE_URL}vite.svg`}
          alt={title}
         />
 

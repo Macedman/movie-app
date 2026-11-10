@@ -4,7 +4,7 @@ import Search from "./components/Search";
 import Spinner from "./components/Spinner";
 import MovieCard from "./components/MovieCard";
 import { useDebounce } from "react-use";
-import { getTrendingMovies,updateSearchCount } from "./appwrite";
+import { getTrendingMovies, updateSearchCount } from "./appwrite";
 import headerImg from "./assets/header.jpeg";
 
 const API_BASE_URL = "https://api.themoviedb.org/3";
@@ -34,52 +34,50 @@ const App = () => {
   useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
 
 
-  const fetchMovies = async (query = '') => {
-    setIsLoading(true);
-    setErrorMessage('');
-    try {
-      const endpoint = query 
-      ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
-      : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
-
-      const response = await fetch(endpoint, API_OPTIONS);
-      if (!response.ok) {
-        throw new Error("Response was not ok");
-      } else {
-        const data = await response.json();
-        console.log(data);
-        
-        if(data.Response === 'False') {
-            setErrorMessage(data.Error || 'Failed to fetch movies')
-            setMovieList([]);
-            return;
-        }
-
-        setMovieList(data.results || []);
-
-        if(query && data.results?.length > 0) {
-            await updateSearchCount(query, data.results[0]);
-        }
-      }
-    } catch (error) {
-      console.error(`Error fetching movies: ${error}`);
-      setErrorMessage(`Error fetching movies. Please try again.`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const loadTrendingMovies = async () => {
     try {
       const movies = await getTrendingMovies();
       setTrendingMovies(Array.isArray(movies) ? movies : []);
     } catch (error) {
-      console.log(`Error loading trending movies`, error);
+      console.error("Error loading trending movies", error);
     }
-  }
+  };
+
+  // `signal` lets the effect cancel this request if a newer search starts,
+  // so a slow, stale response can't overwrite newer results.
+  const fetchMovies = async (query, signal) => {
+    setIsLoading(true);
+    setErrorMessage("");
+    try {
+      const endpoint = query
+        ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+        : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+
+      const response = await fetch(endpoint, { ...API_OPTIONS, signal });
+      if (!response.ok) {
+        throw new Error(`TMDB request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      setMovieList(data.results || []);
+      setIsLoading(false);
+
+      if (query && data.results?.length > 0) {
+        await updateSearchCount(query, data.results[0]);
+        loadTrendingMovies();
+      }
+    } catch (error) {
+      if (error.name === "AbortError") return; // superseded by a newer search
+      console.error("Error fetching movies", error);
+      setErrorMessage("Error fetching movies. Please try again.");
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchMovies(debouncedSearchTerm);
+    const controller = new AbortController();
+    fetchMovies(debouncedSearchTerm.trim(), controller.signal);
+    return () => controller.abort();
   }, [debouncedSearchTerm]);
 
  useEffect(() => {
